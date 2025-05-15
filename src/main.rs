@@ -25,6 +25,9 @@ fn parse_args(mut args: Vec<String>) -> Result<Cli, String> {
 
 fn run(cli: &Cli) -> Result<String, std::io::Error>{
     let data = std::fs::read_to_string(&cli.file_path)?;
+    if cli.query.is_empty() {
+        return Ok(data);
+    }
     for s in data[..].split('\n') {
         if s.contains(&cli.query) {
             return Ok(String::from(s));
@@ -74,7 +77,17 @@ mod tests {
             file_path: in_test.file_path.clone()};
         let result = run(&cli).unwrap();
         assert_eq!(result, String::from("the filthy fox has escaped"))
+    }
 
+    #[test]
+    fn test_run_no_query() {
+        let in_test = InputTest::default();
+        let cli = Cli {
+            query: String::new(),
+            file_path: in_test.file_path.clone()};
+        let result = run(&cli).unwrap();
+        let expected = std::fs::read_to_string(&in_test.file_path).unwrap();
+        assert_eq!(result, expected)
     }
 
     struct InputTest {
