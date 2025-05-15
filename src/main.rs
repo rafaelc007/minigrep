@@ -46,4 +46,12 @@ mod tests {
         assert_eq!(result.query, "".to_string());
         assert_eq!(result.file_path, "path".to_string());
     }
+
+    #[test]
+    fn test_parse_full() {
+        let args = vec![String::from("filename"), String::from("path"), String::from("query")];
+        let result = parse_args(&args).unwrap();
+        assert_eq!(result.query, "query".to_string());
+        assert_eq!(result.file_path, "path".to_string());
+    }
 }
