@@ -1,31 +1,53 @@
-use minigrep::{Cli, run, parse_args}
+use minigrep::{Cli, run};
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    
+    #[test]
+    fn test_get_cli_file_path() {
+        let cli = Cli::from_args(vec![
+            String::from("filename"),
+            String::from("file_path"),
+            String::from("query")
+        ]);
+        assert_eq!(*cli.file_path(), String::from("file_path"));
+    }
+
+    #[test]
+    fn test_get_cli_query() {
+        let cli = Cli::from_args(vec![
+            String::from("filename"),
+            String::from("file_path"),
+            String::from("query")
+        ]);
+        assert_eq!(*cli.query(), String::from("query"));
+    }
 
     #[test]
     fn test_parse_no_query() {
         let args = vec![String::from("filename"), String::from("path")];
-        let result = parse_args(args).unwrap();
-        assert_eq!(result.query, "".to_string());
-        assert_eq!(result.file_path, "path".to_string());
+        let result = Cli::from_args(args);
+        assert_eq!(*result.query(), "".to_string());
+        assert_eq!(*result.file_path(), "path".to_string());
     }
 
     #[test]
     fn test_parse_full() {
         let args = vec![String::from("filename"), String::from("path"), String::from("query")];
-        let result = parse_args(args).unwrap();
-        assert_eq!(result.query, "query".to_string());
-        assert_eq!(result.file_path, "path".to_string());
+        let result = Cli::from_args(args);
+        assert_eq!(*result.query(), "query".to_string());
+        assert_eq!(*result.file_path(), "path".to_string());
     }
 
     #[test]
     fn test_run() {
         let in_test = InputTest::default();
-        let cli = Cli {
-            query: String::from("has"),
-            file_path: in_test.file_path.clone()};
+        let cli = Cli::from_args(vec![
+            String::new(),
+            String::from("has"),
+            in_test.file_path.clone()
+        ]);
         let result = run(&cli).unwrap();
         assert_eq!(result, String::from("the filthy fox has escaped"))
     }
@@ -33,9 +55,11 @@ mod tests {
     #[test]
     fn test_run_no_query() {
         let in_test = InputTest::default();
-        let cli = Cli {
-            query: String::new(),
-            file_path: in_test.file_path.clone()};
+        let cli = Cli::from_args(vec![
+            String::new(),
+            in_test.file_path.clone(),
+            String::new()
+        ]);
         let result = run(&cli).unwrap();
         let expected = std::fs::read_to_string(&in_test.file_path).unwrap();
         assert_eq!(result, expected)
@@ -47,12 +71,14 @@ mod tests {
 
     impl Drop for InputTest {
         fn drop(&mut self) {
+            println!("Rmoving file {}", &self.file_path);
             std::fs::remove_file(&self.file_path).unwrap();
         }
     }
     impl Default for InputTest {
         fn default() -> Self {
             // create test file
+            println!("Creating file test.txt");
             let file_path = "test.txt";
             let write_str = "The red fox going up\nthe black fox going down\nthe filthy fox has escaped";
             std::fs::write(file_path, write_str).unwrap();
