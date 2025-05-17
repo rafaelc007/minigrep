@@ -45,8 +45,8 @@ mod tests {
         let in_test = InputTest::default();
         let cli = Cli::from_args(vec![
             String::new(),
-            String::from("has"),
-            in_test.file_path.clone()
+            in_test.file_path.clone(),
+            String::from("has")
         ]);
         let result = run(&cli).unwrap();
         assert_eq!(result, String::from("the filthy fox has escaped"))
@@ -62,7 +62,20 @@ mod tests {
         ]);
         let result = run(&cli).unwrap();
         let expected = std::fs::read_to_string(&in_test.file_path).unwrap();
-        assert_eq!(result, expected)
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_run_multiline() {
+        let in_test = InputTest::default();
+        let cli = Cli::from_args(vec![
+            String::new(),
+            in_test.file_path.clone(),
+            String::from("fox")
+        ]);
+        let result = run(&cli).unwrap();
+        let expected = std::fs::read_to_string(&in_test.file_path).unwrap();
+        assert_eq!(result, expected);
     }
 
     struct InputTest {
@@ -71,8 +84,8 @@ mod tests {
 
     impl Drop for InputTest {
         fn drop(&mut self) {
-            println!("Rmoving file {}", &self.file_path);
-            std::fs::remove_file(&self.file_path).unwrap();
+            println!("Removing file {}", &self.file_path);
+            std::fs::remove_file(&self.file_path).unwrap_or_default();
         }
     }
     impl Default for InputTest {

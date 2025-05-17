@@ -33,11 +33,19 @@ pub fn run(cli: &Cli) -> Result<String, std::io::Error>{
     if cli.query().is_empty() {
         return Ok(data);
     }
-    for s in data[..].split('\n') {
+    let mut ret_str = String::new();
+    for s in data[..].lines() {
         if s.contains(cli.query()) {
-            return Ok(String::from(s));
+            if !ret_str.is_empty() {
+                ret_str.push('\n');
+            }
+            ret_str += s;
         }
     }
-    Err(std::io::Error::new(std::io::ErrorKind::Other,
-        "Failed to find pattern"))
+    if ret_str.is_empty() {
+        return Err(std::io::Error::new(std::io::ErrorKind::Other,
+            "Failed to find pattern"))
+    } else {
+        return Ok(ret_str);
+    }
 }
