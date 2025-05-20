@@ -9,6 +9,6 @@ fn main() {
     // call run function
     match run(&cli) {
         Ok(x) => {iomsg::out(&x)},
-        Err(e) => {iomsg::warn(&e.to_string());}
+        Err(e) => {iomsg::err(&e.to_string());}
     };
 }
