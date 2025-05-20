@@ -6,11 +6,11 @@ mod tests {
     
     #[test]
     fn test_get_cli_file_path() {
-        let cli = Cli::from_args(vec![
+        let str_iter = vec![
             String::from("filename"),
             String::from("file_path"),
-            String::from("query")
-        ]);
+            String::from("query")].into_iter();
+        let cli = Cli::from_args(str_iter);
         assert_eq!(*cli.file_path(), String::from("file_path"));
     }
 
@@ -20,13 +20,13 @@ mod tests {
             String::from("filename"),
             String::from("file_path"),
             String::from("query")
-        ]);
+        ].into_iter());
         assert_eq!(*cli.query(), String::from("query"));
     }
 
     #[test]
     fn test_parse_no_query() {
-        let args = vec![String::from("filename"), String::from("path")];
+        let args = vec![String::from("filename"), String::from("path")].into_iter();
         let result = Cli::from_args(args);
         assert_eq!(*result.query(), "".to_string());
         assert_eq!(*result.file_path(), "path".to_string());
@@ -34,7 +34,7 @@ mod tests {
 
     #[test]
     fn test_parse_full() {
-        let args = vec![String::from("filename"), String::from("path"), String::from("query")];
+        let args = vec![String::from("filename"), String::from("path"), String::from("query")].into_iter();
         let result = Cli::from_args(args);
         assert_eq!(*result.query(), "query".to_string());
         assert_eq!(*result.file_path(), "path".to_string());
@@ -47,7 +47,7 @@ mod tests {
             String::new(),
             in_test.file_path.clone(),
             String::from("has")
-        ]);
+        ].into_iter());
         let result = run(&cli).unwrap();
         assert_eq!(result, String::from("the filthy fox has escaped"))
     }
@@ -59,7 +59,7 @@ mod tests {
             String::new(),
             in_test.file_path.clone(),
             String::new()
-        ]);
+        ].into_iter());
         let result = run(&cli).unwrap();
         let expected = std::fs::read_to_string(&in_test.file_path).unwrap();
         assert_eq!(result, expected);
@@ -72,7 +72,7 @@ mod tests {
             String::new(),
             in_test.file_path.clone(),
             String::from("fox")
-        ]);
+        ].into_iter());
         let result = run(&cli).unwrap();
         let expected = std::fs::read_to_string(&in_test.file_path).unwrap();
         assert_eq!(result, expected);

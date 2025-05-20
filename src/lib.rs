@@ -9,18 +9,18 @@ pub struct Cli {
 impl Cli {
     pub fn query(&self) -> &String {&self.query}
     pub fn file_path(&self) -> &String {&self.file_path}
-    pub fn from_args(mut args: Vec<String>) -> Self {
-        let arg_len = args.len();
-        let query = if arg_len > 2  {
-            args.remove(2) } else {
-                iomsg::warn("Missing argument query, entire file will be printed");
-                String::new()
-        };
-        let file_path = if arg_len > 1 {
-            args.remove(1) } else {
-                iomsg::err("Missing file path");
-                String::new()
-        };
+    pub fn from_args(mut args: impl Iterator<Item = String>) -> Self {
+        // First argument is always path to curr file, discard
+        args.next();
+        // Second argument is always path to file
+        let file_path = args.next().unwrap_or_else(|| {
+            iomsg::err("Missing file path");
+            String::new()});
+        // Third argument is query
+        let query = args.next().unwrap_or_else(|| {
+            iomsg::warn("Missing argument query, entire file will be printed");
+            String::new()
+        });
         Cli {
             query: query.clone(),
             file_path:file_path.clone()
